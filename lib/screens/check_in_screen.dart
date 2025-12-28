@@ -36,6 +36,28 @@ class _CheckInScreenState extends State<CheckInScreen>
   final Map<String, TextEditingController> _giftControllers = {};
   final Map<String, TextEditingController> _posmControllers = {};
 
+  // =========================
+  // KEY NAMESPACE THEO SHOP
+  // =========================
+  String get _shopKey {
+    // Ưu tiên outletId (ổn định), fallback outletName
+    final id = _outletIdController.text.trim();
+    final name = (_selectedOutletName ?? '').trim();
+    final base = id.isNotEmpty ? id : name;
+
+    // tránh ký tự lạ
+    return base.isEmpty
+        ? "NO_SHOP"
+        : base.replaceAll(RegExp(r'[^a-zA-Z0-9_\-]'), '_');
+  }
+
+  String _k(String field) => "in_${_shopKey}_$field";
+
+  bool get _hasSelectedShop =>
+      _selectedOutletName != null &&
+      (_outletIdController.text.trim().isNotEmpty ||
+          (_selectedOutletName ?? '').trim().isNotEmpty);
+
   @override
   void initState() {
     super.initState();
@@ -57,14 +79,16 @@ class _CheckInScreenState extends State<CheckInScreen>
 
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
+
     setState(() {
       String today = DateFormat('dd/MM/yyyy').format(DateTime.now());
       _dateController.text = prefs.getString('in_date') ?? today;
       _supController.text = prefs.getString('in_sup') ?? "Nguyễn Thanh Minh";
+
       _outletIdController.text = prefs.getString('in_outlet_id') ?? "";
       _addressController.text = prefs.getString('in_address') ?? "";
-      _noteController.text = prefs.getString('in_note') ?? "";
 
+      // SP + Outlet đã chọn lần trước
       String? savedSP = prefs.getString('in_sp_name');
       String? savedOutlet = prefs.getString('in_store_name');
 
@@ -73,23 +97,23 @@ class _CheckInScreenState extends State<CheckInScreen>
         _filteredOutlets = masterData
             .where((e) => e.spName == _selectedSP)
             .toList();
+
         if (savedOutlet != null &&
             _filteredOutlets.any((e) => e.name == savedOutlet)) {
           _selectedOutletName = savedOutlet;
+          // outletId/address đã set ở trên từ prefs
         }
       }
-
-      for (var p in productListCheckIn) {
-        _qtyControllers[p]?.text = prefs.getString('in_qty_$p') ?? "";
-        _priceControllers[p]?.text = prefs.getString('in_price_$p') ?? "";
-      }
-      for (var g in giftList) {
-        _giftControllers[g]?.text = prefs.getString('in_gift_$g') ?? "";
-      }
-      for (var p in posmList) {
-        _posmControllers[p]?.text = prefs.getString('in_posm_$p') ?? "";
-      }
     });
+
+    // Load dữ liệu theo shop nếu có shop
+    if (_hasSelectedShop) {
+      await _loadShopData();
+    } else {
+      // nếu chưa chọn shop thì chỉ load note "global" (tuỳ bạn)
+      // ở đây mình để trống các field theo shop
+      _clearShopControllersOnly();
+    }
   }
 
   Future<void> _saveSelection(String key, String? value) async {
@@ -101,23 +125,62 @@ class _CheckInScreenState extends State<CheckInScreen>
     setState(() {
       _selectedSP = newValue;
       _selectedOutletName = null;
+
       _outletIdController.clear();
       _addressController.clear();
+
       _filteredOutlets = masterData.where((e) => e.spName == newValue).toList();
     });
+
     _saveSelection('in_sp_name', newValue);
+
+    // đổi SP thì chưa có shop => clear controllers theo shop
+    _clearShopControllersOnly();
   }
 
-  void _onOutletChanged(String? newValue) {
+  void _onOutletChanged(String? newValue) async {
     setState(() {
       _selectedOutletName = newValue;
       final outletObj = masterData.firstWhere((e) => e.name == newValue);
       _outletIdController.text = outletObj.id;
       _addressController.text = outletObj.address;
     });
-    _saveSelection('in_store_name', newValue);
-    _saveSelection('in_outlet_id', _outletIdController.text);
-    _saveSelection('in_address', _addressController.text);
+
+    await _saveSelection('in_store_name', newValue);
+    await _saveSelection('in_outlet_id', _outletIdController.text);
+    await _saveSelection('in_address', _addressController.text);
+
+    // Quan trọng: load data theo shop vừa chọn
+    await _loadShopData();
+  }
+
+  Future<void> _loadShopData() async {
+    if (!_hasSelectedShop) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      for (var p in productListCheckIn) {
+        _qtyControllers[p]?.text = prefs.getString(_k("qty_$p")) ?? "";
+        _priceControllers[p]?.text = prefs.getString(_k("price_$p")) ?? "";
+      }
+      for (var g in giftList) {
+        _giftControllers[g]?.text = prefs.getString(_k("gift_$g")) ?? "";
+      }
+      for (var p in posmList) {
+        _posmControllers[p]?.text = prefs.getString(_k("posm_$p")) ?? "";
+      }
+      _noteController.text = prefs.getString(_k("note")) ?? "";
+    });
+  }
+
+  void _clearShopControllersOnly() {
+    setState(() {
+      for (var c in _qtyControllers.values) c.clear();
+      for (var c in _priceControllers.values) c.clear();
+      for (var c in _giftControllers.values) c.clear();
+      for (var c in _posmControllers.values) c.clear();
+      _noteController.clear();
+    });
   }
 
   void _confirmReset() {
@@ -126,8 +189,10 @@ class _CheckInScreenState extends State<CheckInScreen>
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Xác nhận làm mới"),
-          content: const Text(
-            "Bạn có chắc chắn muốn xoá hết dữ liệu Check-in đang nhập không?",
+          content: Text(
+            _hasSelectedShop
+                ? "Bạn có chắc chắn muốn xoá hết dữ liệu Check-in của shop này không?"
+                : "Bạn chưa chọn shop. Bạn có chắc chắn muốn xoá dữ liệu đang nhập không?",
           ),
           actions: [
             TextButton(
@@ -137,7 +202,7 @@ class _CheckInScreenState extends State<CheckInScreen>
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _resetDailyData();
+                _resetShopData(); // reset theo shop
               },
               child: const Text(
                 "Đồng ý",
@@ -153,41 +218,48 @@ class _CheckInScreenState extends State<CheckInScreen>
     );
   }
 
-  Future<void> _resetDailyData() async {
+  Future<void> _resetShopData() async {
     final prefs = await SharedPreferences.getInstance();
+
+    // vẫn giữ ngày hôm nay + sup + selection
     setState(() {
       String today = DateFormat('dd/MM/yyyy').format(DateTime.now());
       _dateController.text = today;
       prefs.setString('in_date', today);
+    });
 
+    // Nếu chưa có shop, chỉ clear controller trên UI
+    if (!_hasSelectedShop) {
+      _clearShopControllersOnly();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Đã làm mới dữ liệu đang nhập!")),
+      );
+      return;
+    }
+
+    setState(() {
       _noteController.clear();
-      prefs.setString('in_note', '');
-      for (var c in _qtyControllers.values) {
-        c.clear();
-      }
-      for (var c in _priceControllers.values) {
-        c.clear();
-      }
-      for (var c in _giftControllers.values) {
-        c.clear();
-      }
-      for (var c in _posmControllers.values) {
-        c.clear();
-      }
+      prefs.remove(_k("note"));
+
+      for (var c in _qtyControllers.values) c.clear();
+      for (var c in _priceControllers.values) c.clear();
+      for (var c in _giftControllers.values) c.clear();
+      for (var c in _posmControllers.values) c.clear();
 
       for (var p in productListCheckIn) {
-        prefs.remove('in_qty_$p');
-        prefs.remove('in_price_$p');
+        prefs.remove(_k("qty_$p"));
+        prefs.remove(_k("price_$p"));
       }
       for (var g in giftList) {
-        prefs.remove('in_gift_$g');
+        prefs.remove(_k("gift_$g"));
       }
       for (var p in posmList) {
-        prefs.remove('in_posm_$p');
+        prefs.remove(_k("posm_$p"));
       }
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Đã làm mới dữ liệu cho ngày hôm nay!")),
+      const SnackBar(content: Text("Đã làm mới dữ liệu cho shop hiện tại!")),
     );
   }
 
@@ -204,16 +276,17 @@ class _CheckInScreenState extends State<CheckInScreen>
     sb.writeln("1/ Hàng hoá tồn đầu:");
     for (int i = 0; i < productListCheckIn.length; i++) {
       final p = productListCheckIn[i];
-
       String qty = _qtyControllers[p]?.text ?? "";
       String price = _priceControllers[p]?.text ?? "";
 
-
-
       if (qty.isNotEmpty || price.isNotEmpty) {
-        sb.writeln("- $p ${i != (productListCheckIn.length - 1) ? "(thùng): $qty  Giá bán: $price/thùng" : ""}");
+        sb.writeln(
+          "- $p ${i != (productListCheckIn.length - 1) ? "(thùng): $qty  Giá bán: $price/thùng" : ""}",
+        );
       } else {
-        sb.writeln("- $p ${i != (productListCheckIn.length - 1) ? "(thùng): Giá bán: /thùng" : ""}");
+        sb.writeln(
+          "- $p ${i != (productListCheckIn.length - 1) ? "(thùng): Giá bán: /thùng" : ""}",
+        );
       }
     }
 
@@ -405,48 +478,87 @@ class _CheckInScreenState extends State<CheckInScreen>
               ),
             ),
             buildHeader("1/ Hàng hoá tồn đầu", AppColors.primaryCheckIn),
+
             buildSectionCard(
               child: Column(
-                children: productListCheckIn
-                    .map(
-                      (product) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                product,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9), // xanh nhạt
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.green.shade300),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.tips_and_updates_outlined,
+                          color: Colors.green,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              Text(
+                                "Lưu ý khi nhập giá",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 6),
+                              Text("• Nhập theo định dạng: 100.000"),
+                              Text("• Đừng quên thêm 000 ở cuối"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  ...productListCheckIn
+                      .map(
+                        (product) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  product,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              flex: 2,
-                              child: buildNumberInput(
-                                "SL",
-                                _qtyControllers[product]!,
-                                'in_qty_$product',
+                              const SizedBox(width: 10),
+                              Expanded(
+                                flex: 2,
+                                child: buildNumberInput(
+                                  "SL",
+                                  _qtyControllers[product]!,
+                                  _k("qty_$product"),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              flex: 3,
-                              child: buildNumberInput(
-                                "Giá",
-                                _priceControllers[product]!,
-                                'in_price_$product',
-                                hintText: "100.000",
-                                isCurrency: true,
+                              const SizedBox(width: 5),
+                              Expanded(
+                                flex: 3,
+                                child: buildNumberInput(
+                                  "Giá",
+                                  _priceControllers[product]!,
+                                  _k("price_$product"),
+                                  hintText: "100.000",
+                                  isCurrency: true,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ],
               ),
             ),
             buildHeader("2/ Quà tặng & POSM", AppColors.primaryCheckIn),
@@ -464,7 +576,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                             child: buildNumberInput(
                               "SL",
                               _giftControllers[g]!,
-                              'in_gift_$g',
+                              _k("gift_$g"),
                             ),
                           ),
                         ],
@@ -483,7 +595,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                             child: buildNumberInput(
                               "Cái",
                               _posmControllers[p]!,
-                              'in_posm_$p',
+                              _k("posm_$p"),
                             ),
                           ),
                         ],
@@ -498,7 +610,7 @@ class _CheckInScreenState extends State<CheckInScreen>
               child: buildTextField(
                 "Ghi chú...",
                 _noteController,
-                'in_note',
+                _k("note"),
                 Icons.note,
                 maxLines: 3,
               ),
