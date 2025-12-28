@@ -41,12 +41,16 @@ class _CheckInScreenState extends State<CheckInScreen>
     super.initState();
     _uniqueSPs = masterData.map((e) => e.spName).toSet().toList();
 
-    for (var p in productList) {
+    for (var p in productListCheckIn) {
       _qtyControllers[p] = TextEditingController();
       _priceControllers[p] = TextEditingController();
     }
-    for (var g in giftList) _giftControllers[g] = TextEditingController();
-    for (var p in posmList) _posmControllers[p] = TextEditingController();
+    for (var g in giftList) {
+      _giftControllers[g] = TextEditingController();
+    }
+    for (var p in posmList) {
+      _posmControllers[p] = TextEditingController();
+    }
 
     _loadSavedData();
   }
@@ -75,14 +79,16 @@ class _CheckInScreenState extends State<CheckInScreen>
         }
       }
 
-      for (var p in productList) {
+      for (var p in productListCheckIn) {
         _qtyControllers[p]?.text = prefs.getString('in_qty_$p') ?? "";
         _priceControllers[p]?.text = prefs.getString('in_price_$p') ?? "";
       }
-      for (var g in giftList)
+      for (var g in giftList) {
         _giftControllers[g]?.text = prefs.getString('in_gift_$g') ?? "";
-      for (var p in posmList)
+      }
+      for (var p in posmList) {
         _posmControllers[p]?.text = prefs.getString('in_posm_$p') ?? "";
+      }
     });
   }
 
@@ -156,17 +162,29 @@ class _CheckInScreenState extends State<CheckInScreen>
 
       _noteController.clear();
       prefs.setString('in_note', '');
-      for (var c in _qtyControllers.values) c.clear();
-      for (var c in _priceControllers.values) c.clear();
-      for (var c in _giftControllers.values) c.clear();
-      for (var c in _posmControllers.values) c.clear();
+      for (var c in _qtyControllers.values) {
+        c.clear();
+      }
+      for (var c in _priceControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftControllers.values) {
+        c.clear();
+      }
+      for (var c in _posmControllers.values) {
+        c.clear();
+      }
 
-      for (var p in productList) {
+      for (var p in productListCheckIn) {
         prefs.remove('in_qty_$p');
         prefs.remove('in_price_$p');
       }
-      for (var g in giftList) prefs.remove('in_gift_$g');
-      for (var p in posmList) prefs.remove('in_posm_$p');
+      for (var g in giftList) {
+        prefs.remove('in_gift_$g');
+      }
+      for (var p in posmList) {
+        prefs.remove('in_posm_$p');
+      }
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Đã làm mới dữ liệu cho ngày hôm nay!")),
@@ -184,21 +202,29 @@ class _CheckInScreenState extends State<CheckInScreen>
     sb.writeln("Địa Chỉ: ${_addressController.text}");
 
     sb.writeln("1/ Hàng hoá tồn đầu:");
-    for (var p in productList) {
+    for (int i = 0; i < productListCheckIn.length; i++) {
+      final p = productListCheckIn[i];
+
       String qty = _qtyControllers[p]?.text ?? "";
       String price = _priceControllers[p]?.text ?? "";
+
+
+
       if (qty.isNotEmpty || price.isNotEmpty) {
-        sb.writeln("- $p (thùng): $qty  Giá bán: $price/thùng");
+        sb.writeln("- $p ${i != (productListCheckIn.length - 1) ? "(thùng): $qty  Giá bán: $price/thùng" : ""}");
       } else {
-        sb.writeln("- $p (thùng):   Giá bán:   /thùng");
+        sb.writeln("- $p ${i != (productListCheckIn.length - 1) ? "(thùng): Giá bán: /thùng" : ""}");
       }
     }
+
     sb.writeln("2/ Quà tặng tồn đầu:");
-    for (var g in giftList)
-      sb.writeln("- $g (hộp/bao): ${_giftControllers[g]?.text}");
+    for (var g in giftList) {
+      sb.writeln("- $g: ${_giftControllers[g]?.text}");
+    }
     sb.writeln("3/ POSM :");
-    for (var p in posmList)
+    for (var p in posmList) {
       sb.writeln("- $p (cái): ${_posmControllers[p]?.text}");
+    }
     sb.writeln("Ghi chú: ${_noteController.text}");
 
     Clipboard.setData(ClipboardData(text: sb.toString()));
@@ -304,12 +330,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                     'in_date',
                     Icons.calendar_today,
                   ),
-                  buildTextField(
-                    "SUP",
-                    _supController,
-                    'in_sup',
-                    Icons.person,
-                  ),
+                  buildTextField("SUP", _supController, 'in_sup', Icons.person),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: DropdownButtonFormField<String>(
@@ -386,7 +407,7 @@ class _CheckInScreenState extends State<CheckInScreen>
             buildHeader("1/ Hàng hoá tồn đầu", AppColors.primaryCheckIn),
             buildSectionCard(
               child: Column(
-                children: productList
+                children: productListCheckIn
                     .map(
                       (product) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),

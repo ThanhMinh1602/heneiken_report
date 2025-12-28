@@ -51,7 +51,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     _uniqueSPs = masterData.map((e) => e.spName).toSet().toList();
     
     // Khởi tạo controller cho cả Thùng và Lon
-    for (var p in productList) {
+    for (var p in productListCheckOut) {
       _salesControllers[p] = TextEditingController();
       _salesCanControllers[p] = TextEditingController();
     }
@@ -95,7 +95,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       _difficultyController.text = prefs.getString('out_difficulty') ?? "";
       _noteController.text = prefs.getString('out_note') ?? "";
 
-      for (var p in productList) {
+      for (var p in productListCheckOut) {
         _salesControllers[p]?.text = prefs.getString('out_sales_$p') ?? "";
         // Load dữ liệu Lon
         _salesCanControllers[p]?.text = prefs.getString('out_sales_can_$p') ?? "";
@@ -186,7 +186,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       for (var c in _salesCanControllers.values) c.clear(); // Clear Lon
       for (var c in _giftUsedControllers.values) c.clear();
       
-      for (var p in productList) {
+      for (var p in productListCheckOut) {
         prefs.remove('out_sales_$p');
         prefs.remove('out_sales_can_$p'); // Remove Lon
       }
@@ -217,7 +217,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     int totalCases = 0;
     int totalCans = 0;
 
-    for (var p in productList) {
+    for (var p in productListCheckOut) {
       // Cộng Thùng
       String caseText = _salesControllers[p]?.text ?? "";
       if (caseText.isNotEmpty) {
@@ -246,7 +246,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     sb.writeln("2/ Tổng doanh số bán hàng (thùng) : $totalStr");
 
     // --- HIỂN THỊ TỪNG MÃ SẢN PHẨM ---
-    for (var p in productList) {
+    for (var p in productListCheckOut) {
       String rawCase = _salesControllers[p]?.text ?? "";
       String rawCan = _salesCanControllers[p]?.text ?? "";
       
@@ -449,7 +449,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                       ],
                     ),
                   ),
-                  ...productList.map((p) => Padding(
+                  ...productListCheckOut.map((p) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
