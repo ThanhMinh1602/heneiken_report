@@ -7,15 +7,16 @@ void main() {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const WorkReportApp(),
+      // Đặt theme chung ở đây để đồng bộ
       theme: ThemeData(
         useMaterial3: false,
         primaryColor: AppColors.primaryCheckOut,
+        scaffoldBackgroundColor: AppColors.bgGrey, // Màu nền chung
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primaryCheckOut,
         ),
-        // ... (giữ nguyên theme cũ của bạn) ...
       ),
+      home: const WorkReportApp(),
     ),
   );
 }
@@ -27,44 +28,57 @@ class WorkReportApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: SafeArea( // 1. Thêm SafeArea để tránh bị tai thỏ che mất TabBar
+      child: SafeArea(
         child: Scaffold(
-          backgroundColor: AppColors.bgGrey,
           appBar: AppBar(
             backgroundColor: Colors.white,
-            foregroundColor: Colors.black87,
-            elevation: 1,
-            toolbarHeight:  0, // Giữ nguyên để ẩn toolbar
+            elevation: 2, // Tăng bóng đổ nhẹ để tách biệt hẳn với body
+            toolbarHeight: 0, // Ẩn toolbar chuẩn
+            
             bottom: const TabBar(
+              // MÀU SẮC & INDICATOR
               labelColor: AppColors.primaryCheckIn,
               unselectedLabelColor: Colors.grey,
               indicatorColor: AppColors.primaryCheckIn,
-              indicatorWeight: 1,
+              indicatorWeight: 3, // Dày hơn chút để rõ ràng
+              indicatorSize: TabBarIndicatorSize.tab, // Gạch chân full chiều rộng tab
               
-              // 2. Chỉnh padding về 0 hoặc rất nhỏ để Tab gọn nhất có thể
-              labelPadding: EdgeInsets.symmetric(vertical: 6),
+              // TYPOGRAPHY (FONT CHỮ)
+              labelStyle: TextStyle(
+                fontWeight: FontWeight.bold, // Tab được chọn sẽ in đậm
+                fontSize: 13,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontWeight: FontWeight.normal, // Tab chưa chọn in thường
+                fontSize: 13,
+              ),
+
+              // SPACING (KHOẢNG CÁCH)
+              // Xóa labelPadding cứng để tránh overflow trên máy nhỏ
+              // labelPadding: EdgeInsets.zero, 
               
               tabs: [
                 Tab(
-                  icon: Icon(Icons.login, size: 22),
+                  icon: Icon(Icons.login), // Để size mặc định (24) hoặc chỉnh 22 tuỳ ý
                   text: "CHECK-IN",
-                  // 3. XÓA thuộc tính height: 50 (nguyên nhân gây overflow)
-                  iconMargin: EdgeInsets.only(bottom: 2), 
+                  iconMargin: EdgeInsets.only(bottom: 4), // Khoảng cách chuẩn
                 ),
                 Tab(
-                  icon: Icon(Icons.logout, size: 22),
+                  icon: Icon(Icons.logout),
                   text: "CHECK-OUT",
-                  // 3. XÓA thuộc tính height: 50
-                  iconMargin: EdgeInsets.only(bottom: 2),
+                  iconMargin: EdgeInsets.only(bottom: 4),
                 ),
               ],
             ),
           ),
+          
+          // BODY
           body: const TabBarView(
+            physics: BouncingScrollPhysics(), // Hiệu ứng lướt mượt mà
             children: [
               CheckInScreen(), 
               CheckOutScreen()
-            ]
+            ],
           ),
         ),
       ),
