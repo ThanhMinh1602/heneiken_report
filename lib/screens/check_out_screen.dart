@@ -343,15 +343,23 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       prefs.remove('out_difficulty');
       prefs.remove('out_note');
 
-      for (var c in _salesControllers.values) c.clear();
-      for (var c in _salesCanControllers.values) c.clear();
-      for (var c in _giftUsedControllers.values) c.clear();
+      for (var c in _salesControllers.values) {
+        c.clear();
+      }
+      for (var c in _salesCanControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftUsedControllers.values) {
+        c.clear();
+      }
 
       for (var p in productListCheckOut) {
         prefs.remove('out_sales_$p');
         prefs.remove('out_sales_can_$p');
       }
-      for (var g in giftList) prefs.remove('out_gift_$g');
+      for (var g in giftList) {
+        prefs.remove('out_gift_$g');
+      }
     });
     _recalcTotalsFromProducts();
   }
@@ -427,7 +435,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: DropdownButtonFormField<String>(
-                      value: _selectedSP,
+                      initialValue: _selectedSP,
                       decoration: InputDecoration(
                         labelText: "Chọn SP",
                         prefixIcon: const Icon(Icons.badge, color: Colors.grey),
@@ -451,7 +459,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: DropdownButtonFormField<String>(
-                      value: _selectedOutletName,
+                      initialValue: _selectedOutletName,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: "Chọn Cửa Hàng",
@@ -705,9 +713,15 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     _advantageController.dispose();
     _difficultyController.dispose();
     _noteController.dispose();
-    for (var c in _salesControllers.values) c.dispose();
-    for (var c in _salesCanControllers.values) c.dispose();
-    for (var c in _giftUsedControllers.values) c.dispose();
+    for (var c in _salesControllers.values) {
+      c.dispose();
+    }
+    for (var c in _salesCanControllers.values) {
+      c.dispose();
+    }
+    for (var c in _giftUsedControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 }

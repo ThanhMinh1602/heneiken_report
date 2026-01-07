@@ -7,11 +7,10 @@ void main() {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      // Đặt theme chung ở đây để đồng bộ
       theme: ThemeData(
         useMaterial3: false,
         primaryColor: AppColors.primaryCheckOut,
-        scaffoldBackgroundColor: AppColors.bgGrey, // Màu nền chung
+        scaffoldBackgroundColor: AppColors.bgGrey,
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primaryCheckOut,
         ),
@@ -32,36 +31,30 @@ class WorkReportApp extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.white,
-            elevation: 2, // Tăng bóng đổ nhẹ để tách biệt hẳn với body
-            toolbarHeight: 0, // Ẩn toolbar chuẩn
+            elevation: 2,
+            toolbarHeight: 0,
             
             bottom: const TabBar(
-              // MÀU SẮC & INDICATOR
               labelColor: AppColors.primaryCheckIn,
               unselectedLabelColor: Colors.grey,
               indicatorColor: AppColors.primaryCheckIn,
-              indicatorWeight: 3, // Dày hơn chút để rõ ràng
-              indicatorSize: TabBarIndicatorSize.tab, // Gạch chân full chiều rộng tab
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.tab,
               
-              // TYPOGRAPHY (FONT CHỮ)
               labelStyle: TextStyle(
-                fontWeight: FontWeight.bold, // Tab được chọn sẽ in đậm
+                fontWeight: FontWeight.bold,
                 fontSize: 13,
               ),
               unselectedLabelStyle: TextStyle(
-                fontWeight: FontWeight.normal, // Tab chưa chọn in thường
+                fontWeight: FontWeight.normal,
                 fontSize: 13,
               ),
 
-              // SPACING (KHOẢNG CÁCH)
-              // Xóa labelPadding cứng để tránh overflow trên máy nhỏ
-              // labelPadding: EdgeInsets.zero, 
-              
               tabs: [
                 Tab(
-                  icon: Icon(Icons.login), // Để size mặc định (24) hoặc chỉnh 22 tuỳ ý
+                  icon: Icon(Icons.login),
                   text: "CHECK-IN",
-                  iconMargin: EdgeInsets.only(bottom: 4), // Khoảng cách chuẩn
+                  iconMargin: EdgeInsets.only(bottom: 4),
                 ),
                 Tab(
                   icon: Icon(Icons.logout),
@@ -72,14 +65,35 @@ class WorkReportApp extends StatelessWidget {
             ),
           ),
           
-          // BODY
           body: const TabBarView(
-            physics: BouncingScrollPhysics(), // Hiệu ứng lướt mượt mà
+            physics: BouncingScrollPhysics(),
             children: [
               CheckInScreen(), 
               CheckOutScreen()
             ],
           ),
+
+          // --- PHẦN FOOTER VERSION ---
+          bottomNavigationBar: Container(
+            height: 24, // Chiều cao nhỏ gọn
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100, // Màu nền nhẹ nhàng
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade300, width: 0.5),
+              ),
+            ),
+            child: const Text(
+              "Version 1.0.0", // Nội dung version
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 10,
+                fontStyle: FontStyle.italic, // Chữ nghiêng cho nghệ
+              ),
+            ),
+          ),
+          // ---------------------------
+          
         ),
       ),
     );

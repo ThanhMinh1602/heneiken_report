@@ -163,10 +163,18 @@ class _CheckInScreenState extends State<CheckInScreen>
 
   void _clearShopControllersOnly() {
     setState(() {
-      for (var c in _qtyControllers.values) c.clear();
-      for (var c in _priceControllers.values) c.clear();
-      for (var c in _giftControllers.values) c.clear(); // Để trống thay vì 0 để UI sạch
-      for (var c in _posmControllers.values) c.clear();
+      for (var c in _qtyControllers.values) {
+        c.clear();
+      }
+      for (var c in _priceControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftControllers.values) {
+        c.clear(); // Để trống thay vì 0 để UI sạch
+      }
+      for (var c in _posmControllers.values) {
+        c.clear();
+      }
       _noteController.clear();
     });
   }
@@ -218,17 +226,29 @@ class _CheckInScreenState extends State<CheckInScreen>
     setState(() {
       _noteController.clear();
       prefs.remove(_k("note"));
-      for (var c in _qtyControllers.values) c.clear();
-      for (var c in _priceControllers.values) c.clear();
-      for (var c in _giftControllers.values) c.clear();
-      for (var c in _posmControllers.values) c.clear();
+      for (var c in _qtyControllers.values) {
+        c.clear();
+      }
+      for (var c in _priceControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftControllers.values) {
+        c.clear();
+      }
+      for (var c in _posmControllers.values) {
+        c.clear();
+      }
 
       for (var p in productListCheckIn) {
         prefs.remove(_k("qty_$p"));
         prefs.remove(_k("price_$p"));
       }
-      for (var g in giftList) prefs.remove(_k("gift_$g"));
-      for (var p in posmList) prefs.remove(_k("posm_$p"));
+      for (var g in giftList) {
+        prefs.remove(_k("gift_$g"));
+      }
+      for (var p in posmList) {
+        prefs.remove(_k("posm_$p"));
+      }
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -371,7 +391,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: DropdownButtonFormField<String>(
-                      value: _selectedSP,
+                      initialValue: _selectedSP,
                       decoration: InputDecoration(
                         labelText: "Chọn SP (Nhân viên)",
                         prefixIcon: const Icon(Icons.badge, color: Colors.grey),
@@ -388,7 +408,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: DropdownButtonFormField<String>(
-                      value: _selectedOutletName,
+                      initialValue: _selectedOutletName,
                       isExpanded: true,
                       decoration: InputDecoration(
                         labelText: "Chọn Cửa Hàng",
@@ -467,7 +487,7 @@ class _CheckInScreenState extends State<CheckInScreen>
                         ],
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),
@@ -479,12 +499,11 @@ class _CheckInScreenState extends State<CheckInScreen>
                 children: [
                   ...giftList.map((g) {
                     // Hiển thị tên quà + gợi ý đơn vị trên UI để user dễ biết
-                    String unitHint = (g.toLowerCase().contains("bao") || g.toLowerCase().contains("lì xì")) ? "(bao)" : "(hộp)";
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(
                         children: [
-                          Expanded(flex: 2, child: Text("$g $unitHint")),
+                          Expanded(flex: 2, child: Text(g)),
                           Expanded(flex: 1, child: buildNumberInput("SL", _giftControllers[g]!, _k("gift_$g"))),
                         ],
                       ),
