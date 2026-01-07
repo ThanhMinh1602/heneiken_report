@@ -63,7 +63,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     return int.tryParse(t.replaceAll('.', '')) ?? 0;
   }
 
-  // Tự động tính tổng khi nhập số liệu
+  // Tự động tính tổng khi nhập số liệu (Hiển thị trên UI)
   void _recalcTotalsFromProducts() {
     if (_updatingTotals) return;
 
@@ -82,7 +82,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
   }
 
   // ======================
-  // LOGIC FORMAT REPORT (MỚI)
+  // LOGIC FORMAT REPORT
   // ======================
 
   // 1. Làm sạch tên (Bỏ chữ thùng nếu có)
@@ -90,22 +90,19 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     return rawName.replaceAll("(thùng)", "").trim();
   }
 
-  // 2. Format dòng chi tiết: "0 thùng + lon" hoặc "2 thùng + lon" hoặc "8 thùng + 12 lon"
+  // 2. Format dòng chi tiết từng sản phẩm
   String _formatDetailFormNew(String productName) {
     final valCase = _parseInt(_salesControllers[productName]?.text ?? "");
     final valCan = _parseInt(_salesCanControllers[productName]?.text ?? "");
 
-    // Luôn hiện số thùng (kể cả 0)
     String strCase = "$valCase";
-
-    // Lon: Nếu > 0 thì hiện số + dấu cách, nếu = 0 thì rỗng
     String strCanNumber = valCan > 0 ? "$valCan " : "";
 
     return "$strCase thùng + ${strCanNumber}lon";
   }
 
-  // 3. Tính tổng quy đổi (thập phân nếu lẻ)
-  String _calculateDecimalTotal() {
+  // [UPDATED] 3. Tính tổng quy đổi dạng: X thùng + Y lon
+  String _calculateTotalMixed() {
     int sumCases = 0;
     int sumCans = 0;
 
@@ -114,18 +111,20 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       sumCans += _parseInt(_salesCanControllers[p]?.text ?? "");
     }
 
-    double decimalFromCans = sumCans / 24.0;
-    double total = sumCases + decimalFromCans;
+    // Quy đổi: 24 lon = 1 thùng
+    int extraCases = sumCans ~/ 24;   // Lấy phần nguyên (số thùng từ lon)
+    int remainingCans = sumCans % 24; // Lấy phần dư (số lon lẻ)
 
-    // Nếu tròn (vd 10.0) -> lấy 10. Nếu lẻ (10.5) -> lấy 10.5
-    if (total == total.roundToDouble()) {
-      return total.toInt().toString();
+    int finalCases = sumCases + extraCases;
+
+    if (remainingCans > 0) {
+      return "$finalCases thùng + $remainingCans lon";
     } else {
-      return total.toStringAsFixed(2).replaceAll(RegExp(r"([.]*0+)(?!.*\d)"), "");
+      return "$finalCases thùng";
     }
   }
 
-  // HÀM COPY CHÍNH (ĐÃ CẬP NHẬT)
+  // HÀM COPY CHÍNH
   void _copyReport() {
     final sb = StringBuffer();
 
@@ -155,8 +154,9 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     sb.writeln("");
 
     // -- Doanh số --
-    String totalStr = _calculateDecimalTotal();
-    sb.writeln("2/ Tổng doanh số bán hàng : $totalStr thùng");
+    // [UPDATED] Sử dụng hàm tính mới
+    String totalStr = _calculateTotalMixed();
+    sb.writeln("2/ Tổng doanh số bán hàng : $totalStr");
 
     for (final p in productListCheckOut) {
       if (p.toLowerCase().contains("số bán hvn khác")) {
@@ -185,8 +185,6 @@ class _CheckOutScreenState extends State<CheckOutScreen>
 
     // -- Footer --
     sb.writeln("Khó khăn : ${_difficultyController.text.trim()}");
-    
-    // [UPDATE] Thêm dòng Ghi chú vào báo cáo
     sb.writeln("Ghi chú : ${_noteController.text.trim()}");
 
     Clipboard.setData(ClipboardData(text: sb.toString()));
