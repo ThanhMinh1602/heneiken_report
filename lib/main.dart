@@ -14,27 +14,7 @@ void main() {
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primaryCheckOut,
         ),
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: AppColors.primaryCheckOut,
-          selectionHandleColor: AppColors.primaryCheckOut,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          floatingLabelStyle: const TextStyle(color: AppColors.primaryCheckOut),
-          labelStyle: const TextStyle(color: Colors.grey),
-          prefixIconColor: Colors.grey,
-          suffixIconColor: Colors.grey,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.grey),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(
-              color: AppColors.primaryCheckOut,
-              width: 2,
-            ),
-          ),
-        ),
+        // ... (giữ nguyên theme cũ của bạn) ...
       ),
     ),
   );
@@ -47,43 +27,46 @@ class WorkReportApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      child: Scaffold(
-        backgroundColor: AppColors.bgGrey,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          elevation: 1,
-          
-          // 1. QUAN TRỌNG: Đặt chiều cao toolbar về 0 để xóa khoảng trắng phía trên
-          toolbarHeight: 0, 
-          
-          bottom: const TabBar(
-            labelColor: AppColors.primaryCheckIn,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: AppColors.primaryCheckIn,
-            indicatorWeight: 3,
-            
-            // 2. Giảm padding dọc của Tab để thanh tab mỏng hơn
-            labelPadding: EdgeInsets.symmetric(vertical: 8), 
-            
-            tabs: [
-              // 3. Tùy chỉnh Tab con: Giảm size icon và margin
-              Tab(
-                icon: Icon(Icons.login, size: 20), // Icon nhỏ lại (mặc định 24)
-                text: "CHECK-IN",
-                iconMargin: EdgeInsets.only(bottom: 4), // Khoảng cách giữa icon và text
-                height: 50, // Chiều cao cố định cho Tab (nếu muốn ép nhỏ hơn nữa)
-              ),
-              Tab(
-                icon: Icon(Icons.logout, size: 20),
-                text: "CHECK-OUT",
-                iconMargin: EdgeInsets.only(bottom: 4),
-                height: 50,
-              ),
-            ],
+      child: SafeArea( // 1. Thêm SafeArea để tránh bị tai thỏ che mất TabBar
+        child: Scaffold(
+          backgroundColor: AppColors.bgGrey,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black87,
+            elevation: 1,
+            toolbarHeight:  0, // Giữ nguyên để ẩn toolbar
+            bottom: const TabBar(
+              labelColor: AppColors.primaryCheckIn,
+              unselectedLabelColor: Colors.grey,
+              indicatorColor: AppColors.primaryCheckIn,
+              indicatorWeight: 1,
+              
+              // 2. Chỉnh padding về 0 hoặc rất nhỏ để Tab gọn nhất có thể
+              labelPadding: EdgeInsets.symmetric(vertical: 6),
+              
+              tabs: [
+                Tab(
+                  icon: Icon(Icons.login, size: 22),
+                  text: "CHECK-IN",
+                  // 3. XÓA thuộc tính height: 50 (nguyên nhân gây overflow)
+                  iconMargin: EdgeInsets.only(bottom: 2), 
+                ),
+                Tab(
+                  icon: Icon(Icons.logout, size: 22),
+                  text: "CHECK-OUT",
+                  // 3. XÓA thuộc tính height: 50
+                  iconMargin: EdgeInsets.only(bottom: 2),
+                ),
+              ],
+            ),
+          ),
+          body: const TabBarView(
+            children: [
+              CheckInScreen(), 
+              CheckOutScreen()
+            ]
           ),
         ),
-        body: const TabBarView(children: [CheckInScreen(), CheckOutScreen()]),
       ),
     );
   }

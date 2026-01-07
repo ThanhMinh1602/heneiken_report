@@ -112,7 +112,7 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     }
 
     // Quy đổi: 24 lon = 1 thùng
-    int extraCases = sumCans ~/ 24;   // Lấy phần nguyên (số thùng từ lon)
+    int extraCases = sumCans ~/ 24; // Lấy phần nguyên (số thùng từ lon)
     int remainingCans = sumCans % 24; // Lấy phần dư (số lon lẻ)
 
     int finalCases = sumCases + extraCases;
@@ -148,7 +148,9 @@ class _CheckOutScreenState extends State<CheckOutScreen>
     // -- Traffic --
     sb.writeln("1/ Thông tin Traffic");
     sb.writeln("- Số khách hàng đến cửa hàng: ${_trafficTotalController.text}");
-    sb.writeln("- Số khách hàng chuyển đổi từ bia đối thủ: ${_trafficConvertController.text}");
+    sb.writeln(
+      "- Số khách hàng chuyển đổi từ bia đối thủ: ${_trafficConvertController.text}",
+    );
     sb.writeln("- Số khách hàng mua bia HVN: ${_trafficBuyHVNController.text}");
     sb.writeln("- Số khách mua bia: ${_trafficBuyBeerController.text}");
     sb.writeln("");
@@ -185,7 +187,9 @@ class _CheckOutScreenState extends State<CheckOutScreen>
 
     // -- Footer --
     sb.writeln("Khó khăn : ${_difficultyController.text.trim()}");
-    sb.writeln("Ghi chú : ${_noteController.text.trim()}");
+    if (_noteController.text.trim().isNotEmpty) {
+      sb.writeln("Ghi chú : ${_noteController.text.trim()}");
+    }
 
     Clipboard.setData(ClipboardData(text: sb.toString()));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -232,8 +236,9 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       String? savedOutlet = prefs.getString('in_store_name');
       if (savedSP != null && _uniqueSPs.contains(savedSP)) {
         _selectedSP = savedSP;
-        _filteredOutlets =
-            masterData.where((e) => e.spName == _selectedSP).toList();
+        _filteredOutlets = masterData
+            .where((e) => e.spName == _selectedSP)
+            .toList();
         if (savedOutlet != null &&
             _filteredOutlets.any((e) => e.name == savedOutlet)) {
           _selectedOutletName = savedOutlet;
@@ -241,9 +246,11 @@ class _CheckOutScreenState extends State<CheckOutScreen>
       }
 
       _trafficTotalController.text = prefs.getString('out_traffic_total') ?? "";
-      _trafficConvertController.text = prefs.getString('out_traffic_convert') ?? "";
+      _trafficConvertController.text =
+          prefs.getString('out_traffic_convert') ?? "";
       _trafficBuyHVNController.text = prefs.getString('out_traffic_hvn') ?? "";
-      _trafficBuyBeerController.text = prefs.getString('out_traffic_beer') ?? "";
+      _trafficBuyBeerController.text =
+          prefs.getString('out_traffic_beer') ?? "";
 
       _advantageController.text = prefs.getString('out_advantage') ?? "";
       _difficultyController.text = prefs.getString('out_difficulty') ?? "";
@@ -251,7 +258,8 @@ class _CheckOutScreenState extends State<CheckOutScreen>
 
       for (var p in productListCheckOut) {
         _salesControllers[p]?.text = prefs.getString('out_sales_$p') ?? "";
-        _salesCanControllers[p]?.text = prefs.getString('out_sales_can_$p') ?? "";
+        _salesCanControllers[p]?.text =
+            prefs.getString('out_sales_can_$p') ?? "";
       }
 
       for (var g in giftList) {
@@ -295,8 +303,9 @@ class _CheckOutScreenState extends State<CheckOutScreen>
         content: const Text("Xoá hết số liệu bán hàng hôm nay?"),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Huỷ")),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Huỷ"),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
@@ -395,8 +404,10 @@ class _CheckOutScreenState extends State<CheckOutScreen>
               children: [
                 buildHeader("Thông tin chung", AppColors.primaryCheckOut),
                 IconButton(
-                  icon: const Icon(Icons.cleaning_services_rounded,
-                      color: Colors.orange),
+                  icon: const Icon(
+                    Icons.cleaning_services_rounded,
+                    color: Colors.orange,
+                  ),
                   onPressed: _confirmReset,
                 ),
               ],
@@ -404,9 +415,14 @@ class _CheckOutScreenState extends State<CheckOutScreen>
             buildSectionCard(
               child: Column(
                 children: [
-                  buildTextField("Ngày (dd/MM/yyyy)", _dateController, 'in_date', Icons.calendar_today),
+                  buildTextField(
+                    "Ngày (dd/MM/yyyy)",
+                    _dateController,
+                    'in_date',
+                    Icons.calendar_today,
+                  ),
                   buildTextField("SUP", _supController, 'in_sup', Icons.person),
-                  
+
                   // SP Dropdown
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
@@ -415,15 +431,22 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                       decoration: InputDecoration(
                         labelText: "Chọn SP",
                         prefixIcon: const Icon(Icons.badge, color: Colors.grey),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         filled: true,
                         fillColor: Colors.grey.shade50,
                       ),
-                      items: _uniqueSPs.map((sp) => DropdownMenuItem(value: sp, child: Text(sp))).toList(),
+                      items: _uniqueSPs
+                          .map(
+                            (sp) =>
+                                DropdownMenuItem(value: sp, child: Text(sp)),
+                          )
+                          .toList(),
                       onChanged: _onSPChanged,
                     ),
                   ),
-                  
+
                   // Outlet Dropdown
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
@@ -433,17 +456,41 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                       decoration: InputDecoration(
                         labelText: "Chọn Cửa Hàng",
                         prefixIcon: const Icon(Icons.store, color: Colors.grey),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         filled: true,
                         fillColor: Colors.grey.shade50,
                       ),
-                      items: _selectedSP == null ? [] : _filteredOutlets.map((out) => DropdownMenuItem(value: out.name, child: Text(out.name, overflow: TextOverflow.ellipsis))).toList(),
+                      items: _selectedSP == null
+                          ? []
+                          : _filteredOutlets
+                                .map(
+                                  (out) => DropdownMenuItem(
+                                    value: out.name,
+                                    child: Text(
+                                      out.name,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                       onChanged: _onOutletChanged,
                     ),
                   ),
 
-                  buildTextField("Mã Outlet", _outletIdController, 'in_outlet_id', Icons.qr_code),
-                  buildTextField("Địa Chỉ", _addressController, 'in_address', Icons.location_on),
+                  buildTextField(
+                    "Mã Outlet",
+                    _outletIdController,
+                    'in_outlet_id',
+                    Icons.qr_code,
+                  ),
+                  buildTextField(
+                    "Địa Chỉ",
+                    _addressController,
+                    'in_address',
+                    Icons.location_on,
+                  ),
                 ],
               ),
             ),
@@ -453,13 +500,29 @@ class _CheckOutScreenState extends State<CheckOutScreen>
             buildSectionCard(
               child: Column(
                 children: [
-                  _trafficRow("Khách đến", _trafficTotalController, 'out_traffic_total'),
+                  _trafficRow(
+                    "Khách đến",
+                    _trafficTotalController,
+                    'out_traffic_total',
+                  ),
                   const SizedBox(height: 10),
-                  _trafficRow("Khách chuyển đổi", _trafficConvertController, 'out_traffic_convert'),
+                  _trafficRow(
+                    "Khách chuyển đổi",
+                    _trafficConvertController,
+                    'out_traffic_convert',
+                  ),
                   const SizedBox(height: 10),
-                  _trafficRow("Mua bia HVN", _trafficBuyHVNController, 'out_traffic_hvn'),
+                  _trafficRow(
+                    "Mua bia HVN",
+                    _trafficBuyHVNController,
+                    'out_traffic_hvn',
+                  ),
                   const SizedBox(height: 10),
-                  _trafficRow("Tổng mua bia", _trafficBuyBeerController, 'out_traffic_beer'),
+                  _trafficRow(
+                    "Tổng mua bia",
+                    _trafficBuyBeerController,
+                    'out_traffic_beer',
+                  ),
                 ],
               ),
             ),
@@ -480,25 +543,78 @@ class _CheckOutScreenState extends State<CheckOutScreen>
                     ),
                     child: Row(
                       children: [
-                        const Text("TỔNG (Auto): ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                        Expanded(child: buildNumberInput("", _totalCaseController, 'out_total_case', hintText: "Thùng")),
+                        const Text(
+                          "TỔNG (Auto): ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        Expanded(
+                          child: buildNumberInput(
+                            "",
+                            _totalCaseController,
+                            'out_total_case',
+                            hintText: "Thùng",
+                          ),
+                        ),
                         const Text(" + ", style: TextStyle(color: Colors.grey)),
-                        Expanded(child: buildNumberInput("", _totalCanController, 'out_total_can', hintText: "lon")),
+                        Expanded(
+                          child: buildNumberInput(
+                            "",
+                            _totalCanController,
+                            'out_total_can',
+                            hintText: "lon",
+                          ),
+                        ),
                       ],
                     ),
                   ),
 
-                  ...productListCheckOut.map((p) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        Expanded(flex: 3, child: Text(p, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500))),
-                        Expanded(flex: 2, child: buildNumberInput("", _salesControllers[p]!, 'out_sales_$p', hintText: "Thùng")),
-                        const Padding(padding: EdgeInsets.symmetric(horizontal: 5), child: Text("+", style: TextStyle(color: Colors.grey))),
-                        Expanded(flex: 2, child: buildNumberInput("", _salesCanControllers[p]!, 'out_sales_can_$p', hintText: "lon")),
-                      ],
+                  ...productListCheckOut.map(
+                    (p) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              p,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: buildNumberInput(
+                              "",
+                              _salesControllers[p]!,
+                              'out_sales_$p',
+                              hintText: "Thùng",
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 5),
+                            child: Text(
+                              "+",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: buildNumberInput(
+                              "",
+                              _salesCanControllers[p]!,
+                              'out_sales_can_$p',
+                              hintText: "lon",
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),
@@ -507,15 +623,26 @@ class _CheckOutScreenState extends State<CheckOutScreen>
             buildHeader("3/ Quà tặng", AppColors.primaryCheckOut),
             buildSectionCard(
               child: Column(
-                children: giftList.map((g) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: [
-                      Expanded(flex: 2, child: Text(g)),
-                      Expanded(flex: 1, child: buildNumberInput("SL", _giftUsedControllers[g]!, 'out_gift_$g')),
-                    ],
-                  ),
-                )).toList(),
+                children: giftList
+                    .map(
+                      (g) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 2, child: Text(g)),
+                            Expanded(
+                              flex: 1,
+                              child: buildNumberInput(
+                                "SL",
+                                _giftUsedControllers[g]!,
+                                'out_gift_$g',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
 
@@ -524,8 +651,19 @@ class _CheckOutScreenState extends State<CheckOutScreen>
             buildSectionCard(
               child: Column(
                 children: [
-                  buildTextField("Khó khăn", _difficultyController, 'out_difficulty', Icons.warning_amber_rounded),
-                  buildTextField("Ghi chú (nếu cần)", _noteController, 'out_note', Icons.note, maxLines: 2),
+                  buildTextField(
+                    "Khó khăn",
+                    _difficultyController,
+                    'out_difficulty',
+                    Icons.warning_amber_rounded,
+                  ),
+                  buildTextField(
+                    "Ghi chú (nếu cần)",
+                    _noteController,
+                    'out_note',
+                    Icons.note,
+                    maxLines: 2,
+                  ),
                 ],
               ),
             ),
@@ -539,7 +677,13 @@ class _CheckOutScreenState extends State<CheckOutScreen>
   Widget _trafficRow(String label, TextEditingController ctrl, String key) {
     return Row(
       children: [
-        Expanded(flex: 3, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600))),
+        Expanded(
+          flex: 3,
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
         const SizedBox(width: 10),
         Expanded(flex: 2, child: buildNumberInput("", ctrl, key)),
       ],

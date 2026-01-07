@@ -26,12 +26,12 @@ final List<String> _baseBeerList = [
   "Larue Blue 33cl",
   "Larue Smooth 33cl",
 ];
+
 // --- LIST CHO MÀN HÌNH CHECK-IN ---
 final List<String> productListCheckIn = [
   ..._baseBeerList,
-  "Sản phẩm khác của HVN:", // Dòng cuối dành riêng cho Check-in
+  "Sản phẩm khác của HVN", // Đã xóa dấu ":" để code tự thêm, tránh bị 2 dấu ::
 ];
-
 // --- LIST CHO MÀN HÌNH CHECK-OUT ---
 final List<String> productListCheckOut = [
   ..._baseBeerList,
