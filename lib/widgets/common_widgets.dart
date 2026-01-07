@@ -72,7 +72,6 @@ Widget buildTextField(
     ),
   );
 }
-
 Widget buildNumberInput(
   String label,
   TextEditingController controller,
@@ -81,6 +80,8 @@ Widget buildNumberInput(
   String hintText = "",
   bool isCurrency = false,
 }) {
+  final showLabel = label.trim().isNotEmpty;
+
   return TextFormField(
     controller: controller,
     keyboardType: TextInputType.number,
@@ -94,10 +95,21 @@ Widget buildNumberInput(
       prefs.setString(saveKey, val);
     },
     decoration: InputDecoration(
-      labelText: label,
-      suffixText: suffix,
+      // ✅ chỉ set labelText khi label có nội dung
+      labelText: showLabel ? label : null,
+
+      // ✅ hint sẽ luôn hiện khi ô đang rỗng (không cần focus)
       hintText: hintText,
-      hintStyle: TextStyle(color: Colors.grey.withOpacity(0.4), fontSize: 13),
+      hintStyle: TextStyle(
+        color: Colors.grey.withOpacity(0.6),
+        fontSize: 12,
+      ),
+
+      // ✅ tránh label floating gây “nuốt” hint/nhìn khó chịu
+      floatingLabelBehavior:
+          showLabel ? FloatingLabelBehavior.auto : FloatingLabelBehavior.never,
+
+      suffixText: suffix,
       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       isDense: true,

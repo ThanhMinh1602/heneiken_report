@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -31,8 +18,65 @@
 
   <title>report_heneiken</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- ===== Loading Screen Styles ===== -->
+  <style>
+    #app-loading {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      z-index: 999999;
+      font-family: Arial, sans-serif;
+    }
+
+    .loader {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #0a7b34; /* đổi sang màu primary nếu muốn */
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 14px;
+      color: #555;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
+
 <body>
+  <!-- ===== Loading Overlay (shows before Flutter is ready) ===== -->
+  <div id="app-loading">
+    <div class="loader"></div>
+    <div class="loading-text">Đang tải...</div>
+  </div>
+
+  <!-- Flutter bootstrap -->
   <script src="flutter_bootstrap.js" async></script>
+
+  <!-- ===== Remove loading when Flutter first frame is rendered ===== -->
+  <script>
+    function removeLoading() {
+      const el = document.getElementById('app-loading');
+      if (el) el.remove();
+    }
+
+    // Flutter web thường bắn event này khi render frame đầu tiên
+    window.addEventListener('flutter-first-frame', removeLoading);
+
+    // Fallback: nếu event không bắn (trường hợp hiếm) thì tự tắt sau 15s
+    setTimeout(removeLoading, 15000);
+  </script>
 </body>
 </html>

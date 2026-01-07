@@ -164,21 +164,37 @@ class _CheckInScreenState extends State<CheckInScreen>
         _priceControllers[p]?.text = prefs.getString(_k("price_$p")) ?? "";
       }
       for (var g in giftList) {
-        _giftControllers[g]?.text = prefs.getString(_k("gift_$g")) ?? "";
+        final val = prefs.getString(_k("gift_$g"));
+        _giftControllers[g]?.text = (val == null || val.trim().isEmpty)
+            ? "0"
+            : val;
       }
       for (var p in posmList) {
-        _posmControllers[p]?.text = prefs.getString(_k("posm_$p")) ?? "";
+        final val = prefs.getString(_k("posm_$p"));
+        _posmControllers[p]?.text = (val == null || val.trim().isEmpty)
+            ? "0"
+            : val;
       }
+
       _noteController.text = prefs.getString(_k("note")) ?? "";
     });
   }
 
   void _clearShopControllersOnly() {
     setState(() {
-      for (var c in _qtyControllers.values) c.clear();
-      for (var c in _priceControllers.values) c.clear();
-      for (var c in _giftControllers.values) c.clear();
-      for (var c in _posmControllers.values) c.clear();
+      for (var c in _qtyControllers.values) {
+        c.clear();
+      }
+      for (var c in _priceControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftControllers.values) {
+        c.text = "0";
+      }
+      for (var c in _posmControllers.values) {
+        c.text = "0";
+      }
+
       _noteController.clear();
     });
   }
@@ -241,10 +257,18 @@ class _CheckInScreenState extends State<CheckInScreen>
       _noteController.clear();
       prefs.remove(_k("note"));
 
-      for (var c in _qtyControllers.values) c.clear();
-      for (var c in _priceControllers.values) c.clear();
-      for (var c in _giftControllers.values) c.clear();
-      for (var c in _posmControllers.values) c.clear();
+      for (var c in _qtyControllers.values) {
+        c.clear();
+      }
+      for (var c in _priceControllers.values) {
+        c.clear();
+      }
+      for (var c in _giftControllers.values) {
+        c.clear();
+      }
+      for (var c in _posmControllers.values) {
+        c.clear();
+      }
 
       for (var p in productListCheckIn) {
         prefs.remove(_k("qty_$p"));
@@ -292,11 +316,13 @@ class _CheckInScreenState extends State<CheckInScreen>
 
     sb.writeln("2/ Quà tặng tồn đầu:");
     for (var g in giftList) {
-      sb.writeln("- $g: ${_giftControllers[g]?.text}");
+      final v = (_giftControllers[g]?.text.trim() ?? "");
+      sb.writeln("- $g: ${v.isEmpty ? "0" : v}");
     }
     sb.writeln("3/ POSM :");
     for (var p in posmList) {
-      sb.writeln("- $p (cái): ${_posmControllers[p]?.text}");
+      final v = (_posmControllers[p]?.text.trim() ?? "");
+      sb.writeln("- $p (cái): ${v.isEmpty ? "0" : v}");
     }
     sb.writeln("Ghi chú: ${_noteController.text}");
 
@@ -314,11 +340,10 @@ class _CheckInScreenState extends State<CheckInScreen>
     super.build(context);
     return Scaffold(
       backgroundColor: AppColors.bgGrey,
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _copyReport,
-        label: const Text("SAO CHÉP CHECK-IN"),
-        icon: const Icon(Icons.copy),
         backgroundColor: AppColors.primaryCheckIn,
+        child:  Icon(Icons.copy, color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
