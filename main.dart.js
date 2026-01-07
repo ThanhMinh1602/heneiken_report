@@ -81329,9 +81329,9 @@ o=o==null?null:o.a.a
 q+="- "+j+": "+i.n6(o==null?"":o)+"\n"
 g.a=q}q+="\n"
 g.a=q
-q+="Kh\xf3 kh\u0103n : "+B.d.dD(i.cx.a.a)+"\n"
-g.a=q
-q=g.a=q+("Ghi ch\xfa : "+B.d.dD(i.cy.a.a)+"\n")
+q=g.a=q+("Kh\xf3 kh\u0103n : "+B.d.dD(i.cx.a.a)+"\n")
+p=B.d.dD(i.cy.a.a)
+if(p.length!==0)q=g.a=q+("Ghi ch\xfa : "+p+"\n")
 A.qi(new A.lf(q.charCodeAt(0)==0?q:q))
 i.c.aj(t.Pu).f.v8(B.OX)},
 ar(){var s,r,q,p,o,n,m,l,k,j=this
