@@ -81460,7 +81460,7 @@ m=A.n3(A.er(A.c([g.wO("Kh\xe1ch \u0111\u1ebfn",g.ax,"out_traffic_total"),B.kX,g.
 l=A.n2("2/ Doanh S\u1ed1",B.ao)
 k=A.dZ(10)
 n=A.Wg(B.mn)
-k=A.c([A.iw(f,A.er(A.c([A.ez(A.c([B.Uk,A.dN(A.kW("",g.Q,"out_total_case","Th\xf9ng",!1,!0),1),B.Uv,A.dN(A.kW("",g.as,"out_total_can","lon",!1,!0),1)],q),B.L,B.M,B.Q),B.ER,A.ez(A.c([B.Gi,B.P1,B.Uy,B.hK,A.dN(A.e5(A.auw(f,B.ej,!1,f,!0,B.S,f,A.aKT(),g.at,f,f,f,f,f,2,A.o4(f,new A.dy(4,A.dZ(8),B.n),f,B.Fp,f,f,f,f,!0,new A.dy(4,A.dZ(8),B.AM),f,f,f,f,f,B.k,!0,f,f,f,f,new A.dy(4,A.dZ(8),B.AO),f,f,f,f,f,f,f,f,f,"85",f,f,f,f,f,f,f,f,f,!0,!0,f,f,f,f,f,f,f,f,f,f,f,f,"%",f),B.ai,!0,f,!0,f,!1,f,B.dE,f,f,f,f,B.zD,f,f,f,1,f,f,!1,"\u2022",f,new A.ael(g),f,f,f,!1,f,f,!1,f,!0,f,B.na,f,f,f,f,f,f,f,f,f,f,f,f,!0,B.eU,f,B.zx,f,f,f,f),45,f),1)],q),B.L,B.M,B.Q)],q),B.L,B.M,B.Q),B.x,new A.d_(B.iB,f,n,k,f,f,B.ay),f,B.fz,B.d5,f)],q)
+k=A.c([A.iw(f,A.er(A.c([A.ez(A.c([B.Uk,A.dN(A.kW("",g.Q,"out_total_case","Th\xf9ng",!1,!0),1),B.Uv,A.dN(A.kW("",g.as,"out_total_can","lon",!1,!0),1)],q),B.L,B.M,B.Q),B.ER,A.ez(A.c([B.Gi,B.P1,B.Uy,B.hK,A.dN(A.e5(A.auw(f,B.ej,!1,f,!0,B.S,f,A.aKT(),g.at,f,f,f,f,f,2,A.o4(f,new A.dy(4,A.dZ(8),B.n),f,B.Fp,f,f,f,f,!0,new A.dy(4,A.dZ(8),B.AM),f,f,f,f,f,B.k,!0,f,f,f,f,new A.dy(4,A.dZ(8),B.AO),f,f,f,f,f,f,f,f,f,"0",f,f,f,f,f,f,f,f,f,!0,!0,f,f,f,f,f,f,f,f,f,f,f,f,"%",f),B.ai,!0,f,!0,f,!1,f,B.dE,f,f,f,f,B.zD,f,f,f,1,f,f,!1,"\u2022",f,new A.ael(g),f,f,f,!1,f,f,!1,f,!0,f,B.na,f,f,f,f,f,f,f,f,f,f,f,f,!0,B.eU,f,B.zx,f,f,f,f),45,f),1)],q),B.L,B.M,B.Q)],q),B.L,B.M,B.Q),B.x,new A.d_(B.iB,f,n,k,f,f,B.ay),f,B.fz,B.d5,f)],q)
 n=$.pY()
 B.b.S(k,new A.a3(n,new A.aem(g),A.U(n).i("a3<1,f>")))
 k=A.n3(A.er(k,B.L,B.M,B.Q))
